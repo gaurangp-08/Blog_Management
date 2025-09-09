@@ -56,4 +56,8 @@ DELETE /api/blogs/{id} → Delete blog (owner only)
 
 # Likes and Unlikes
 POST /api/blogs/{id}/like → Like a blog
+<<<<<<< HEAD
 POST /api/blogs/{id}/unlike → Unlike a blog
+=======
+POST /api/blogs/{id}/unlike → Unlike a blog
+>>>>>>> 3f93fe1d0e5103ae352c66f9520627c0b868fb1a
