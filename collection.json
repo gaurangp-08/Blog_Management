@@ -1,0 +1,476 @@
+{
+  "info": {
+    "name": "Blog Management API",
+    "description": "Complete API collection for Blog Management System with Laravel 10 & Sanctum",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{auth_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Extract and save the token from response",
+                  "if (pm.response.code === 200) {",
+                  "    var response = pm.response.json();",
+                  "    if (response.success && response.data.token) {",
+                  "        pm.environment.set('auth_token', response.data.token);",
+                  "        pm.collectionVariables.set('auth_token', response.data.token);",
+                  "        console.log('Token saved:', response.data.token);",
+                  "    }",
+                  "}",
+                  "",
+                  "pm.test('Login successful', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response contains token', function () {",
+                  "    var response = pm.response.json();",
+                  "    pm.expect(response.data).to.have.property('token');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"john@example.com\",\n    \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": ["{{base_url}}"],
+              "path": ["login"]
+            },
+            "description": "Login with email and password to get authentication token"
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/logout",
+              "host": ["{{base_url}}"],
+              "path": ["logout"]
+            },
+            "description": "Logout and invalidate current token"
+          },
+          "response": []
+        }
+      ],
+      "description": "Authentication related endpoints"
+    },
+    {
+      "name": "Blogs",
+      "item": [
+        {
+          "name": "Get All Blogs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/blogs?page=1&per_page=10",
+              "host": ["{{base_url}}"],
+              "path": ["blogs"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "per_page",
+                  "value": "10",
+                  "description": "Number of items per page"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search in title and description",
+                  "disabled": true
+                },
+                {
+                  "key": "sort_by",
+                  "value": "latest",
+                  "description": "Sort by: latest or most_liked",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get paginated list of blogs with optional search and sorting"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Blogs - Most Liked",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/blogs?sort_by=most_liked&page=1&per_page=5",
+              "host": ["{{base_url}}"],
+              "path": ["blogs"],
+              "query": [
+                {
+                  "key": "sort_by",
+                  "value": "most_liked"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "per_page",
+                  "value": "5"
+                }
+              ]
+            },
+            "description": "Get blogs sorted by most liked first"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Blogs - Latest First",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/blogs?sort_by=latest&page=1&per_page=5",
+              "host": ["{{base_url}}"],
+              "path": ["blogs"],
+              "query": [
+                {
+                  "key": "sort_by",
+                  "value": "latest"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "per_page",
+                  "value": "5"
+                }
+              ]
+            },
+            "description": "Get blogs sorted by latest created first"
+          },
+          "response": []
+        },
+        {
+          "name": "Search Blogs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/blogs?search=laravel&sort_by=most_liked",
+              "host": ["{{base_url}}"],
+              "path": ["blogs"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "laravel",
+                  "description": "Search term for title and description"
+                },
+                {
+                  "key": "sort_by",
+                  "value": "most_liked"
+                }
+              ]
+            },
+            "description": "Search blogs by title and description with sorting"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Blog",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Save blog ID for update/delete operations",
+                  "if (pm.response.code === 201) {",
+                  "    var response = pm.response.json();",
+                  "    if (response.success && response.data.id) {",
+                  "        pm.collectionVariables.set('blog_id', response.data.id);",
+                  "        console.log('Blog ID saved:', response.data.id);",
+                  "    }",
+                  "}",
+                  "",
+                  "pm.test('Blog created successfully', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response contains blog data', function () {",
+                  "    var response = pm.response.json();",
+                  "    pm.expect(response.data).to.have.property('id');",
+                  "    pm.expect(response.data).to.have.property('title');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "My Awesome Blog Post",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "This is a comprehensive guide about creating amazing blog content that engages readers and provides value. In this post, we'll explore various techniques and strategies.",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": [],
+                  "description": "Upload an image file (jpeg, png, jpg, gif - max 2MB)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/blogs",
+              "host": ["{{base_url}}"],
+              "path": ["blogs"]
+            },
+            "description": "Create a new blog post with title, description and image"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Blog",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "Updated Blog Title",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "This is the updated description for my blog post. I've added more content and improved the overall quality of the post.",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": [],
+                  "description": "Upload new image (optional)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/blogs/{{blog_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["blogs", "{{blog_id}}"]
+            },
+            "description": "Update an existing blog post (only owner can update)"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Blog",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/blogs/{{blog_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["blogs", "{{blog_id}}"]
+            },
+            "description": "Delete a blog post (only owner can delete)"
+          },
+          "response": []
+        },
+        {
+          "name": "Toggle Like Blog",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/blogs/1/toggle-like",
+              "host": ["{{base_url}}"],
+              "path": ["blogs", "1", "toggle-like"]
+            },
+            "description": "Toggle like/unlike for a blog post"
+          },
+          "response": []
+        }
+      ],
+      "description": "Blog management endpoints",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{auth_token}}",
+            "type": "string"
+          }
+        ]
+      }
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// This script runs before every request",
+          "console.log('Making request to:', pm.request.url.toString());"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global test script for all requests",
+          "pm.test('Response time is less than 2000ms', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+          "});",
+          "",
+          "pm.test('Content-Type is application/json', function () {",
+          "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+          "});"
+        ]
+      }
+    }
+  ]
+}
